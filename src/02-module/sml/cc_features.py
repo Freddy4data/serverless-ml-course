@@ -4,7 +4,7 @@ import numpy as np
 from datetime import datetime, date
 from math import radians
 
-# +
+
 def card_owner_age(trans_df : pd.DataFrame, profiles_df : pd.DataFrame)-> pd.DataFrame:
     """Used only in feature pipelines (not online inference). 
        Unit test with DataFrames and sample data.
@@ -110,14 +110,16 @@ def aggregate_activity_by_hour(trans_df : pd.DataFrame, window_len)-> pd.DataFra
 
     # Moving average of transaction volume.
     df_mavg = pd.DataFrame(cc_group.mean())
-    df_mavg.columns = ["trans_volume_mavg", "datetime"]
+    df_mavg.columns = ["trans_volume_mavg", "datetime", "cc_num"]
+    df_mavg = df_mavg.iloc[:,:-1]
     df_mavg = df_mavg.reset_index(level=["cc_num"])
     df_mavg = df_mavg.drop(columns=["cc_num", "datetime"])
     df_mavg = df_mavg.sort_index()
 
     # Moving standard deviation of transaction volume.
     df_std = pd.DataFrame(cc_group.mean())
-    df_std.columns = ["trans_volume_mstd", "datetime"]
+    df_std.columns = ["trans_volume_mstd", "datetime", "cc_num"]
+    df_std = df_std.iloc[:,:-1]
     df_std = df_std.reset_index(level=["cc_num"])
     df_std = df_std.drop(columns=["cc_num", "datetime"])
     df_std = df_std.fillna(0)
@@ -126,7 +128,8 @@ def aggregate_activity_by_hour(trans_df : pd.DataFrame, window_len)-> pd.DataFra
 
     # Moving average of transaction frequency.
     df_count = pd.DataFrame(cc_group.mean())
-    df_count.columns = ["trans_freq", "datetime"]
+    df_count.columns = ["trans_freq", "datetime", "cc_num"]
+    df_count = df_count.iloc[:,:-1]
     df_count = df_count.reset_index(level=["cc_num"])
     df_count = df_count.drop(columns=["cc_num", "datetime"])
     df_count = df_count.sort_index()
@@ -135,7 +138,8 @@ def aggregate_activity_by_hour(trans_df : pd.DataFrame, window_len)-> pd.DataFra
     # Moving average of location difference between consecutive transactions.
     cc_group = trans_df[["cc_num", "loc_delta_t_minus_1", "datetime"]].groupby("cc_num").rolling(window_len, on="datetime").mean()
     df_loc_delta_mavg = pd.DataFrame(cc_group)
-    df_loc_delta_mavg.columns = ["loc_delta_mavg", "datetime"]
+    df_loc_delta_mavg.columns = ["loc_delta_mavg", "datetime", "cc_num"]
+    df_loc_delta_mavg = df_loc_delta_mavg.iloc[:,:-1]
     df_loc_delta_mavg = df_loc_delta_mavg.reset_index(level=["cc_num"])
     df_loc_delta_mavg = df_loc_delta_mavg.drop(columns=["cc_num", "datetime"])
     df_loc_delta_mavg = df_loc_delta_mavg.sort_index()
